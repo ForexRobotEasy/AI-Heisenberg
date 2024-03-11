@@ -1,0 +1,113 @@
+mql5
+// Forex Robot Easy Team
+// forexroboteasy.com
+
+// Include necessary libraries and define constants
+
+#property copyright 'Forex Robot Easy Team'
+#property link    'forexroboteasy.com'
+
+#define TP_RATIO 1.5 // Take profit ratio
+#define SL_RATIO 1.0 // Stop loss ratio
+
+// Define global variables
+
+input double LotSize = 0.01; // Initial lot size
+int MagicNumber = 12345; // Magic number for order identification
+
+// Define AI Heisenberg class
+
+class AIHeisenberg
+{
+private:
+   double previousPrice;
+   double previousPrediction;
+   double trailingStop;
+   
+   double PredictMarketTrend()
+   {
+      // AI algorithm to predict market trends
+      // Return predicted direction (1 for buy, -1 for sell)
+   }
+   
+   void UpdateTrailingStop(double currentPrice)
+   {
+      // Update trailing stop based on current price
+      // Adjust trailing stop value based on market conditions
+   }
+   
+public:
+   AIHeisenberg()
+   {
+      previousPrice = 0.0;
+      previousPrediction = 0.0;
+      trailingStop = 0.0;
+   }
+   
+   void OnTick()
+   {
+      double currentPrice = MarketInfo(Symbol(), MODE_BID);
+      
+      if (previousPrice == 0.0)
+      {
+         // Initial prediction
+         previousPrediction = PredictMarketTrend();
+         previousPrice = currentPrice;
+         return;
+      }
+      
+      // Check for reversal
+      if (MathAbs(currentPrice - previousPrice) > trailingStop)
+      {
+         double currentPrediction = PredictMarketTrend();
+         
+         if (currentPrediction != previousPrediction)
+         {
+            // Reversal detected, take action based on prediction
+            if (currentPrediction == 1)
+            {
+               // Buy
+               double stopLoss = currentPrice - (currentPrice - previousPrice) * SL_RATIO;
+               double takeProfit = currentPrice + (currentPrice - previousPrice) * TP_RATIO;
+               OrderSend(Symbol(), OP_BUY, LotSize, currentPrice, 0, stopLoss, takeProfit, 'AI Heisenberg', MagicNumber, 0, Green);
+            }
+            else if (currentPrediction == -1)
+            {
+               // Sell
+               double stopLoss = currentPrice + (previousPrice - currentPrice) * SL_RATIO;
+               double takeProfit = currentPrice - (previousPrice - currentPrice) * TP_RATIO;
+               OrderSend(Symbol(), OP_SELL, LotSize, currentPrice, 0, stopLoss, takeProfit, 'AI Heisenberg', MagicNumber, 0, Red);
+            }
+         }
+         
+         previousPrediction = currentPrediction;
+         previousPrice = currentPrice;
+      }
+      
+      UpdateTrailingStop(currentPrice);
+   }
+};
+
+AIHeisenberg aiHeisenberg;
+
+// OnInit function
+
+void OnInit()
+{
+   // Initiate AI Heisenberg
+}
+
+// OnTick function
+
+void OnTick()
+{
+   aiHeisenberg.OnTick();
+}
+
+// OnDeinit function
+
+void OnDeinit(const int reason)
+{
+   // Deinitialize AI Heisenberg
+}
+
